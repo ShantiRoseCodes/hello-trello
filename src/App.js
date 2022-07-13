@@ -5,6 +5,8 @@ import './App.css';
 
 function App() {
   const [boards, setBoards] = useState();
+  const [selected, setSelected] = useState([]);
+
 
   useEffect(
     () => {
@@ -19,6 +21,11 @@ function App() {
     console.log(res.data);
     setBoards(res.data);
   }
+
+  // Adds selected id's to array, selected
+  function handleSelect (event) {
+    setSelected([...selected, event.target.id])
+  }
   
   return (
     <div>
@@ -26,7 +33,7 @@ function App() {
         <ul>
           {
             boards && boards.map( b => 
-              <li id = {b.id}> { b.name } </li>)
+              < li id = {b.id} onClick = {handleSelect}> { b.name } </li>)
           }
         </ul>
 
