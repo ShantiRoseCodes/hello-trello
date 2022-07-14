@@ -36,3 +36,18 @@
     transform: rotate(360deg);
   }
 }
+
+li {
+  list-style-type: none;
+}
+
+li:hover{
+  cursor: pointer;
+  background-color: #5f0a5f;
+  color: #ffffff;
+}
+
+.active {
+  background-color: #5f0a5f;
+  color: #ffffff;
+}

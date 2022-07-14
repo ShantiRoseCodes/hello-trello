@@ -5,7 +5,8 @@ import './App.css';
 
 function App() {
   const [boards, setBoards] = useState();
-  const [selected, setSelected] = useState([]);
+  
+
 
 
   useEffect(
@@ -18,22 +19,41 @@ function App() {
     const res = await axios.get(
        `https://api.trello.com/1/members/me/boards?fields=name,id,starred&key=${myKey}&token=${myToken}`
     );
-    console.log(res.data);
-    setBoards(res.data);
+    let trelloboards = res.data;
+    trelloboards.map(b => b['selected'] = false);
+    console.log(trelloboards);
+    setBoards(trelloboards);
   }
 
-  // Adds selected id's to array, selected
-  function handleSelect (event) {
-    setSelected([...selected, event.target.id])
+  function handleClick (event) {
+    let trelloId = event.target.id;
+    let findBoard = boards.find(b => b.id === trelloId);
+    let li = event.target.closest('li');
+    
+    if(findBoard['selected'] === false){
+      findBoard['selected'] = true;
+      li.classList.add('active');
+    } else {
+      findBoard['selected'] = false;
+      li.classList.remove('active');
+    }
+
+    console.log(findBoard);
+
   }
+
   
   return (
     <div>
       <h1> Hello Trello </h1>
         <ul>
-          {
+          { 
             boards && boards.map( b => 
-              < li id = {b.id} onClick = {handleSelect}> { b.name } </li>)
+              < li  id = {b.id}
+                    key = {b.id}
+                    onClick = {handleClick}
+                    > 
+                  { b.name } -- {b['selected']}</li>)
           }
         </ul>
 
