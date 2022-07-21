@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { myKey, myToken } from './keys'; 
 import './App.css';
+import { myKey, myToken } from './keys'
 
 function App() {
   const [boards, setBoards] = useState();
+  const [count, setCount] = useState(0);
+  const [selected, setSelected] = useState([]);
   
-
-
-
   useEffect(
     () => {
       getBoards();
@@ -21,7 +20,6 @@ function App() {
     );
     let trelloboards = res.data;
     trelloboards.map(b => b['selected'] = false);
-    console.log(trelloboards);
     setBoards(trelloboards);
   }
 
@@ -30,22 +28,75 @@ function App() {
     let findBoard = boards.find(b => b.id === trelloId);
     let li = event.target.closest('li');
     
+    
     if(findBoard['selected'] === false){
       findBoard['selected'] = true;
       li.classList.add('active');
+      countActive();
     } else {
       findBoard['selected'] = false;
       li.classList.remove('active');
+      countActive();
     }
 
-    console.log(findBoard);
-
+    const selectedArr = [...document.querySelectorAll("li.active")].map(
+      (li) => li.id
+   );
+   setSelected(selectedArr);
+   console.log(selectedArr);
   }
+
+
+  function countActive () {
+    const active = document.querySelectorAll("li.active");
+    setCount(active.length);
+  }
+
+  async function handleDelete() {
+    for (const boardID of selected) {
+       try {
+          console.log("Deleting: ", boardID);
+          const res = await axios.delete(
+             `https://api.trello.com/1/boards/${boardID}?key=${myKey}&token=${myToken}`
+          );
+          console.log(res.status, "Success");
+          getBoards();
+       } catch (err) {
+          console.log(err);
+       }
+    }
+ }
+
+ async function handleCreate(){
+  for(const boardID of selected){
+    try{
+      console.log('Creating copy of boardID:', boardID);
+      const res = await axios.post(
+      `https://api.trello.com/1/boards/?name=FS23 Week 1&idBoardSource=${boardID}&key=${myKey}&token=${myToken}`);
+      console.log(res.status, "Success");
+      getBoards();
+    } catch (err) {
+      console.log(err);
+    }
+  }
+ }
+
 
   
   return (
     <div>
       <h1> Hello Trello </h1>
+      <div id="confirm" className="hide">
+         <div id="btnGroup">
+            <button id="delete" type="button" onClick = {handleDelete} > DELETE </button>
+            <button id="cancel" type="button" >CANCEL</button>
+            <button id="create" type="button" onClick = {handleCreate}> CREATE </button>
+         </div>
+      </div>
+      <div id="header">
+            <h3 id="headerText">Click boards to select</h3>
+            <span id="select">{count} Selected</span>
+        </div>
         <ul>
           { 
             boards && boards.map( b => 
@@ -53,9 +104,11 @@ function App() {
                     key = {b.id}
                     onClick = {handleClick}
                     > 
-                  { b.name } -- {b['selected']}</li>)
+                  { b.name } </li>)
           }
         </ul>
+        
+        
 
     </div>    
   )
