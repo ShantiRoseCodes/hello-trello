@@ -67,12 +67,18 @@ function App() {
     }
  }
 
+ //This does not work. Initially, I thought that this would duplicate from the board source
+ //We figured out that it duplicated templates and templates do not get deleted. 
+ // So the next steps: 
+//  Changing the workspace.
+//  Customizing the link so we can have all cohorts. 
+ 
  async function handleCreate(){
-  for(const boardID of selected){
+  for(let i = 0; i < selected.length; i++){
     try{
-      console.log('Creating copy of boardID:', boardID);
+      console.log('Creating copy of boardID:', selected[i]);
       const res = await axios.post(
-      `https://api.trello.com/1/boards/?name=FS23 Week 1&idBoardSource=${boardID}&key=${myKey}&token=${myToken}`);
+      `https://api.trello.com/1/boards/?name=FS20 Week ${i + 1}&idBoardSource=${selected[i]}&key=${myKey}&token=${myToken}`);
       console.log(res.status, "Success");
       getBoards();
     } catch (err) {
