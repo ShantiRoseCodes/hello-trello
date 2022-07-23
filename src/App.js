@@ -7,6 +7,8 @@ function App() {
   const [boards, setBoards] = useState();
   const [count, setCount] = useState(0);
   const [selected, setSelected] = useState([]);
+  const [showForm, setShowForm] = useState(false);
+  const [cohort, setCohort] = useState('');
   
   useEffect(
     () => {
@@ -67,18 +69,33 @@ function App() {
     }
  }
 
+ function showTheForm () {
+  setShowForm(true);
+ }
+
  //This does not work. Initially, I thought that this would duplicate from the board source
  //We figured out that it duplicated templates and templates do not get deleted. 
  // So the next steps: 
 //  Changing the workspace.
 //  Customizing the link so we can have all cohorts. 
- 
- async function handleCreate(){
+// form with cohort name as field -> this appears after create has been clicked.
+
+function handleChange (e) {
+  setCohort(e.target.value);
+}
+
+function handleSubmit (e) {
+  e.preventDefault();
+  createTrello(cohort);
+  setCohort('');
+}
+
+async function createTrello(){
   for(let i = 0; i < selected.length; i++){
     try{
       console.log('Creating copy of boardID:', selected[i]);
       const res = await axios.post(
-      `https://api.trello.com/1/boards/?name=FS20 Week ${i + 1}&idBoardSource=${selected[i]}&key=${myKey}&token=${myToken}`);
+      `https://api.trello.com/1/boards/?name=${cohort} - Week ${i + 1}&idBoardSource=${selected[i]}&key=${myKey}&token=${myToken}`);
       console.log(res.status, "Success");
       getBoards();
     } catch (err) {
@@ -96,13 +113,25 @@ function App() {
          <div id="btnGroup">
             <button id="delete" type="button" onClick = {handleDelete} > DELETE </button>
             <button id="cancel" type="button" >CANCEL</button>
-            <button id="create" type="button" onClick = {handleCreate}> CREATE </button>
+            <button id="create" type="button" onClick = {showTheForm}> CREATE </button>
          </div>
+         <br/>
+         {showForm && 
+         <form onSubmit = {handleSubmit}>
+         <label> Enter cohort name.
+           <input type = "text" covalue = {cohort}  onChange = {handleChange}/>
+         </label> 
+         <button id = "submitButton" type = "submit">Create Trello Boards</button>
+        </form>
+        }
+        <br/>
+        <br/>
       </div>
       <div id="header">
             <h3 id="headerText">Click boards to select</h3>
             <span id="select">{count} Selected</span>
         </div>
+        <br/>
         <ul>
           { 
             boards && boards.map( b => 
@@ -113,9 +142,6 @@ function App() {
                   { b.name } </li>)
           }
         </ul>
-        
-        
-
     </div>    
   )
 }
