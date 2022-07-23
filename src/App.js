@@ -3,12 +3,18 @@ import axios from 'axios';
 import './App.css';
 import { myKey, myToken } from './keys'
 
+let INIT_FORM = {
+  cohort: '',
+  color: ''
+}
+
 function App() {
   const [boards, setBoards] = useState();
   const [count, setCount] = useState(0);
   const [selected, setSelected] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [cohort, setCohort] = useState('');
+  const [board, setBoard] = useState(INIT_FORM);
+  
   
   useEffect(
     () => {
@@ -59,6 +65,7 @@ function App() {
     setCount(0);
     [...document.querySelectorAll("li.active")].map((li) => li.classList.remove('active'))
     console.log(selected); 
+    setShowForm(false);
   }
 
   async function handleDelete() {
@@ -83,13 +90,16 @@ function App() {
 
 
 function handleChange (e) {
-  setCohort(e.target.value);
+  const {name, value} = e.target;
+  setBoard({...board, [name]: value});
+  console.log(board);
 }
 
 function handleSubmit (e) {
   e.preventDefault();
-  createTrello(cohort);
-  setCohort('');
+  console.log(board);
+  createTrello(board);
+  setBoard(INIT_FORM);
 }
 
 
@@ -98,9 +108,10 @@ function handleSubmit (e) {
 async function createTrello(){
   for(let i = 0; i < selected.length; i++){
     try{
+      let url = `https://api.trello.com/1/boards/?name=${board.cohort} - Week ${i + 1}&idBoardSource=${selected[i]}&idOrganization=codeopteam&prefs_background=${board.color}&prefs_permissionLevel=public&key=${myKey}&token=${myToken}`;
+      console.log(url);
       console.log('Creating copy of boardID:', selected[i]);
-      const res = await axios.post(
-      `https://api.trello.com/1/boards/?name=${cohort} - Week ${i + 1}&idBoardSource=${selected[i]}&key=${myKey}&token=${myToken}`);
+      const res = await axios.post(url);
       console.log(res.status, "Success");
       getBoards();
       handleReset(); 
@@ -121,12 +132,24 @@ async function createTrello(){
             <button id="cancel" type="button" onClick = {handleReset}>CANCEL</button>
             <button id="create" type="button" onClick = {showTheForm}> CREATE </button>
          </div>
-         <br/>
          {showForm && 
          <form onSubmit = {handleSubmit}>
          <label> Enter cohort name.
-           <input type = "text" covalue = {cohort}  onChange = {handleChange}/>
+           <input type = "text" name = "cohort" value = {board.cohort}  onChange = {handleChange}/>
          </label> 
+         <label> Choose a color.
+          <select name = "color" value = {board.color}  onChange = {handleChange}>
+            <option value = "red"> Red </option>
+            <option value = "blue"> Blue </option>
+            <option value = "orange"> Orange </option>
+            <option value = "green"> Green </option>
+            <option value = "purple"> Purple </option>
+            <option value = "pink"> Pink </option>
+            <option value = "lime"> Lime </option>
+            <option value = "sky"> Sky </option>
+            <option value = "grey"> Grey </option>
+          </select>
+         </label>
          <button id = "submitButton" type = "submit">Create Trello Boards</button>
         </form>
         }

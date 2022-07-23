@@ -12,6 +12,7 @@ body {
 }
 
 #header {
+  padding: 15px;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -28,18 +29,25 @@ body {
   background: rgba(255, 255, 255, 0.9);
 }
 
+h1{
+  padding: 20px;
+  font-size: 30px;
+  text-align: center;
+}
 
 
 #delete {
   border-radius: 12px;
   padding: 14px 40px;
   font-size: 16px;
+  margin-right: 10px;
   background-color: pink;
 }
 
 #cancel{
   border-radius: 12px;
   padding: 14px 40px;
+  margin-right: 10px;
   font-size: 16px;
   background-color: rgb(192, 234, 255);
 }
@@ -79,7 +87,7 @@ form label {
   color: rgb(7, 7, 7);
 }
 
-input {
+input, select, option {
   padding: 15px;
   margin: 8px 0;
   width: 50%;
