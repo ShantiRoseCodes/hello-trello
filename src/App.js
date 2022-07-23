@@ -54,6 +54,13 @@ function App() {
     setCount(active.length);
   }
 
+  function handleReset () {
+    setSelected([]);
+    setCount(0);
+    [...document.querySelectorAll("li.active")].map((li) => li.classList.remove('active'))
+    console.log(selected); 
+  }
+
   async function handleDelete() {
     for (const boardID of selected) {
        try {
@@ -63,6 +70,7 @@ function App() {
           );
           console.log(res.status, "Success");
           getBoards();
+          handleReset();
        } catch (err) {
           console.log(err);
        }
@@ -73,12 +81,6 @@ function App() {
   setShowForm(true);
  }
 
- //This does not work. Initially, I thought that this would duplicate from the board source
- //We figured out that it duplicated templates and templates do not get deleted. 
- // So the next steps: 
-//  Changing the workspace.
-//  Customizing the link so we can have all cohorts. 
-// form with cohort name as field -> this appears after create has been clicked.
 
 function handleChange (e) {
   setCohort(e.target.value);
@@ -90,6 +92,9 @@ function handleSubmit (e) {
   setCohort('');
 }
 
+
+// figure out endpoint for changing the workspace
+// figure out endpoint for changing the color
 async function createTrello(){
   for(let i = 0; i < selected.length; i++){
     try{
@@ -98,6 +103,7 @@ async function createTrello(){
       `https://api.trello.com/1/boards/?name=${cohort} - Week ${i + 1}&idBoardSource=${selected[i]}&key=${myKey}&token=${myToken}`);
       console.log(res.status, "Success");
       getBoards();
+      handleReset(); 
     } catch (err) {
       console.log(err);
     }
@@ -112,7 +118,7 @@ async function createTrello(){
       <div id="confirm" className="hide">
          <div id="btnGroup">
             <button id="delete" type="button" onClick = {handleDelete} > DELETE </button>
-            <button id="cancel" type="button" >CANCEL</button>
+            <button id="cancel" type="button" onClick = {handleReset}>CANCEL</button>
             <button id="create" type="button" onClick = {showTheForm}> CREATE </button>
          </div>
          <br/>
